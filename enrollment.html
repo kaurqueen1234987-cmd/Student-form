@@ -1,26 +1,238 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Enrollment Form</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Enrollment Form</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2ff;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #263b80;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin: 9px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      background: #263b80;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>Student Enrollment Form</h1>
+  <div class="container">
+    <h2>Student Enrollment Form</h2>
 
-<form>
-    <input type="text" placeholder="Student Name" required><br><br>
+    <form id="enrollmentForm">
 
-    <input type="email" placeholder="Email Address" required><br><br>
+      <input type="text" id="studentName"
+        placeholder="Student Name" required>
 
-    <input type="number" placeholder="Phone Number" required><br><br>
+      <input type="email" id="email"
+        placeholder="Email Address" required>
 
-    <input type="text" placeholder="Course Name" required><br><br>
+      <input type="tel" id="phone"
+        placeholder="Phone Number" required>
 
-    <input type="text" placeholder="Address" required><br><br>
+      <input type="text" id="course"
+        placeholder="Course Name" required>
 
-    <button type="submit">Submit Form</button>
-</form>
+      <input type="text" id="field"
+        placeholder="Field / Branch" required>
+
+      <input type="text" id="college"
+        placeholder="College Name">
+
+      <input type="text" id="rollNumber"
+        placeholder="Roll Number">
+
+      <textarea id="address"
+        placeholder="Full Address" required></textarea>
+
+      <button type="submit" id="submitBtn">
+        Submit Enrollment
+      </button>
+
+    </form>
+
+    <p id="message"></p>
+  </div>
+
+  <script type="module">
+
+    // Firebase imports
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+    import {
+      getAuth,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAui_73IiFeFnpC7EkFqkCoc6FlDwhqhGA",
+      authDomain: "student-form-91ccf.firebaseapp.com",
+      projectId: "student-form-91ccf",
+      storageBucket: "student-form-91ccf.firebasestorage.app",
+      messagingSenderId: "812729360263",
+      appId: "1:812729360263:web:ada5aafd21bec488fafd22",
+      measurementId: "G-NM3BZFZQ2M"
+    };
+
+
+    // Firebase connection
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+
+    // Google Sheet URL
+    const GOOGLE_SCRIPT_URL = "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE";
+
+
+    // Check login
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        currentUser = user;
+
+        document.getElementById("studentName").value =
+          user.displayName || "";
+
+        document.getElementById("email").value =
+          user.email || "";
+      }
+    });
+
+
+    // Form submit
+    const form = document.getElementById("enrollmentForm");
+    const message = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (event) => {
+
+      event.preventDefault();
+
+      if (!currentUser) {
+        message.textContent = "Please sign in first.";
+        return;
+      }
+
+      if (GOOGLE_SCRIPT_URL === "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE") {
+        message.textContent = "Please add your Google Sheet URL first.";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      message.textContent = "Saving your enrollment...";
+
+      const studentData = {
+        uid: currentUser.uid,
+        studentName: document.getElementById("studentName").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        course: document.getElementById("course").value.trim(),
+        field: document.getElementById("field").value.trim(),
+        college: document.getElementById("college").value.trim(),
+        rollNumber: document.getElementById("rollNumber").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        createdAt: serverTimestamp()
+      };
+
+      try {
+
+        // Save in Firebase
+        await addDoc(collection(db, "enrollments"), studentData);
+
+        // Send to Google Sheet
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(studentData)
+        });
+
+        message.textContent =
+          "Enrollment submitted! Please check your Google Sheet.";
+
+        form.reset();
+
+        document.getElementById("studentName").value =
+          currentUser.displayName || "";
+
+        document.getElementById("email").value =
+          currentUser.email || "";
+
+      } catch (error) {
+
+        message.textContent = "Error: " + error.message;
+
+      } finally {
+        submitBtn.disabled = false;
+      }
+
+    });
+
+  </script>
 
 </body>
 </html>
