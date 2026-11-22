@@ -1,9 +1,11 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Enrollment | Live Form</title>
+<title>Student Enrollment Form</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -12,8 +14,7 @@ body {
   margin: 0;
   padding: 25px 15px;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #d9e8ff, #f7d9f2, #d8fff0);
-  min-height: 100vh;
+  background: linear-gradient(135deg,#d9e8ff,#f7d9f2,#d8fff0);
 }
 
 .container {
@@ -35,17 +36,8 @@ body {
   font-weight: bold;
 }
 
-h1 {
-  color: #3546a5;
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-.subtitle {
-  text-align: center;
-  color: #777;
-  margin-bottom: 25px;
-}
+h1 { color: #3546a5; text-align: center; }
+.subtitle { text-align: center; color: #777; }
 
 label {
   display: block;
@@ -61,18 +53,9 @@ input, select, textarea {
   border: 1px solid #d4d9eb;
   border-radius: 9px;
   font-size: 15px;
-  outline: none;
 }
 
-input:focus, select:focus, textarea:focus {
-  border-color: #7165dc;
-  box-shadow: 0 0 0 3px #7165dc20;
-}
-
-textarea {
-  min-height: 85px;
-  resize: vertical;
-}
+textarea { min-height: 85px; }
 
 button {
   width: 100%;
@@ -80,24 +63,25 @@ button {
   padding: 15px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(90deg, #5368db, #a34cc5);
+  background: linear-gradient(90deg,#5368db,#a34cc5);
   color: white;
   font-size: 17px;
   font-weight: bold;
   cursor: pointer;
 }
 
-button:disabled {
-  opacity: 0.65;
-  cursor: wait;
-}
+button:disabled { opacity: .65; cursor: wait; }
 
 #statusMessage {
   text-align: center;
   font-weight: bold;
-  margin-top: 18px;
-  overflow-wrap: anywhere;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 10px;
 }
+
+.success { color: #087c43; background: #e4fff0; }
+.error { color: #b42318; background: #fff0ef; }
 
 .footer {
   text-align: center;
@@ -122,41 +106,41 @@ button:disabled {
 
     <label>Full Name</label>
     <input name="studentName" type="text"
-           placeholder="Enter your full name" required>
+      placeholder="Enter your full name" required>
 
     <label>Email Address</label>
     <input name="email" type="email"
-           placeholder="Enter your email" required>
+      placeholder="Enter your email" required>
 
     <label>Phone Number</label>
     <input name="phone" type="tel"
-           placeholder="Enter phone number" required>
+      placeholder="Enter phone number" required>
 
     <label>Select Course</label>
     <select name="course" required>
       <option value="">Choose your course</option>
-      <option>B.Tech</option>
-      <option>BCA</option>
-      <option>BBA</option>
-      <option>MCA</option>
-      <option>Other</option>
+      <option value="B.Tech">B.Tech</option>
+      <option value="BCA">BCA</option>
+      <option value="BBA">BBA</option>
+      <option value="MCA">MCA</option>
+      <option value="Other">Other</option>
     </select>
 
     <label>Branch / Field</label>
     <input name="field" type="text"
-           placeholder="Enter your branch" required>
+      placeholder="Enter your branch" required>
 
     <label>College Name</label>
     <input name="college" type="text"
-           placeholder="Enter college name" required>
+      placeholder="Enter college name" required>
 
     <label>Roll Number</label>
     <input name="rollNumber" type="text"
-           placeholder="Enter roll number" required>
+      placeholder="Enter roll number" required>
 
     <label>Address</label>
     <textarea name="address"
-              placeholder="Enter your address" required></textarea>
+      placeholder="Enter your address" required></textarea>
 
     <button type="submit" id="submitBtn">
       Submit Enrollment
@@ -164,7 +148,7 @@ button:disabled {
 
   </form>
 
-  <p id="statusMessage" role="status"></p>
+  <p id="statusMessage" role="status" aria-live="polite"></p>
 
   <div class="footer">
     Student Registration Portal | Enrollment Form
@@ -183,13 +167,15 @@ form.addEventListener("submit", async function(event) {
   event.preventDefault();
 
   if (!GOOGLE_SCRIPT_URL.endsWith("/exec")) {
-    statusMessage.textContent = "Please check your Google Apps Script URL.";
+    statusMessage.className = "error";
+    statusMessage.textContent = "Please check your Google Script URL.";
     return;
   }
 
   button.disabled = true;
   button.textContent = "Submitting...";
-  statusMessage.textContent = "Sending enrollment details...";
+  statusMessage.className = "";
+  statusMessage.textContent = "Saving your enrollment...";
 
   const studentData =
     Object.fromEntries(new FormData(form).entries());
@@ -204,14 +190,16 @@ form.addEventListener("submit", async function(event) {
       body: JSON.stringify(studentData)
     });
 
+    statusMessage.className = "success";
     statusMessage.textContent =
-      "Request sent. Please check your Google Sheet for the new entry.";
+      "Request sent! Please verify your enrollment in Google Sheets.";
 
     form.reset();
 
   } catch (error) {
+    statusMessage.className = "error";
     statusMessage.textContent =
-      "Submission failed. Please check your connection and try again.";
+      "Submission failed. Please try again.";
   } finally {
     button.disabled = false;
     button.textContent = "Submit Enrollment";
