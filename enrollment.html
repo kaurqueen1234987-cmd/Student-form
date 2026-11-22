@@ -3,104 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Enrollment Form</title>
+<title>Student Enrollment | Live Form</title>
 
 <style>
 * { box-sizing: border-box; }
 
 body {
-  font-family: Arial, sans-serif;
-  background: #eef2ff;
-  padding: 20px;
   margin: 0;
+  padding: 25px 15px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #d9e8ff, #f7d9f2, #d8fff0);
+  min-height: 100vh;
 }
 
 .container {
-  max-width: 500px;
-  margin: 30px auto;
+  max-width: 620px;
+  margin: 20px auto;
   background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px #0002;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px #35456b30;
 }
 
-h2 {
+.live {
+  display: inline-block;
+  background: #e4fff0;
+  color: #087c43;
+  padding: 9px 15px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+h1 {
+  color: #3546a5;
   text-align: center;
-  color: #263b80;
+  margin-bottom: 8px;
 }
 
-input, textarea {
+.subtitle {
+  text-align: center;
+  color: #777;
+  margin-bottom: 25px;
+}
+
+label {
+  display: block;
+  margin-top: 14px;
+  color: #39466b;
+  font-weight: bold;
+}
+
+input, select, textarea {
   width: 100%;
-  padding: 12px;
-  margin: 9px 0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 13px;
+  margin-top: 7px;
+  border: 1px solid #d4d9eb;
+  border-radius: 9px;
   font-size: 15px;
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #7165dc;
+  box-shadow: 0 0 0 3px #7165dc20;
+}
+
+textarea {
+  min-height: 85px;
+  resize: vertical;
 }
 
 button {
   width: 100%;
-  padding: 13px;
-  background: #263b80;
-  color: white;
+  margin-top: 23px;
+  padding: 15px;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #5368db, #a34cc5);
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
   cursor: pointer;
 }
 
-button:disabled { opacity: 0.6; }
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
 
-#message {
+#statusMessage {
   text-align: center;
-  margin-top: 15px;
+  font-weight: bold;
+  margin-top: 18px;
+  overflow-wrap: anywhere;
+}
+
+.footer {
+  text-align: center;
+  color: #888;
+  font-size: 12px;
+  margin-top: 20px;
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
-<h2>Student Enrollment Form</h2>
 
-<form id="enrollmentForm">
-<input id="studentName" placeholder="Student Name" required>
-<input id="email" type="email" placeholder="Email Address" required>
-<input id="phone" type="tel" placeholder="Phone Number" required>
-<input id="course" placeholder="Course Name" required>
-<input id="field" placeholder="Field / Branch" required>
-<input id="college" placeholder="College Name">
-<input id="rollNumber" placeholder="Roll Number">
-<textarea id="address" placeholder="Full Address" required></textarea>
+  <div style="text-align:center">
+    <span class="live">● LIVE ENROLLMENT FORM</span>
+  </div>
 
-<button type="submit" id="submitBtn">Submit Enrollment</button>
-</form>
+  <h1>Student Enrollment</h1>
+  <p class="subtitle">Complete the form to register your details</p>
 
-<p id="message"></p>
+  <form id="enrollmentForm">
+
+    <label>Full Name</label>
+    <input name="studentName" type="text"
+           placeholder="Enter your full name" required>
+
+    <label>Email Address</label>
+    <input name="email" type="email"
+           placeholder="Enter your email" required>
+
+    <label>Phone Number</label>
+    <input name="phone" type="tel"
+           placeholder="Enter phone number" required>
+
+    <label>Select Course</label>
+    <select name="course" required>
+      <option value="">Choose your course</option>
+      <option>B.Tech</option>
+      <option>BCA</option>
+      <option>BBA</option>
+      <option>MCA</option>
+      <option>Other</option>
+    </select>
+
+    <label>Branch / Field</label>
+    <input name="field" type="text"
+           placeholder="Enter your branch" required>
+
+    <label>College Name</label>
+    <input name="college" type="text"
+           placeholder="Enter college name" required>
+
+    <label>Roll Number</label>
+    <input name="rollNumber" type="text"
+           placeholder="Enter roll number" required>
+
+    <label>Address</label>
+    <textarea name="address"
+              placeholder="Enter your address" required></textarea>
+
+    <button type="submit" id="submitBtn">
+      Submit Enrollment
+    </button>
+
+  </form>
+
+  <p id="statusMessage" role="status"></p>
+
+  <div class="footer">
+    Student Registration Portal | Enrollment Form
+  </div>
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzqQ-GaXWqYtxnQHQSczQhgqEdqHUqAYkKrS2D6YFKbTzSZBbd-OoMEF97ZYqoCaDl07w/exec";
+const GOOGLE_SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbx3rZxPrgbEHuLofGnnEP7Pu361ahwM1a1ezGzU88U8PJctwtAUfetl5afgfho6-lbCBw/exec";
 
 const form = document.getElementById("enrollmentForm");
-const message = document.getElementById("message");
 const button = document.getElementById("submitBtn");
+const statusMessage = document.getElementById("statusMessage");
 
 form.addEventListener("submit", async function(event) {
   event.preventDefault();
 
-  const data = {
-    studentName: document.getElementById("studentName").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    phone: document.getElementById("phone").value.trim(),
-    course: document.getElementById("course").value.trim(),
-    field: document.getElementById("field").value.trim(),
-    college: document.getElementById("college").value.trim(),
-    rollNumber: document.getElementById("rollNumber").value.trim(),
-    address: document.getElementById("address").value.trim()
-  };
+  if (!GOOGLE_SCRIPT_URL.endsWith("/exec")) {
+    statusMessage.textContent = "Please check your Google Apps Script URL.";
+    return;
+  }
 
   button.disabled = true;
-  message.textContent = "Submitting...";
+  button.textContent = "Submitting...";
+  statusMessage.textContent = "Sending enrollment details...";
+
+  const studentData =
+    Object.fromEntries(new FormData(form).entries());
 
   try {
     await fetch(GOOGLE_SCRIPT_URL, {
@@ -109,17 +201,20 @@ form.addEventListener("submit", async function(event) {
       headers: {
         "Content-Type": "text/plain;charset=utf-8"
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(studentData)
     });
 
-    message.textContent = "Request sent. Please check your Google Sheet.";
+    statusMessage.textContent =
+      "Request sent. Please check your Google Sheet for the new entry.";
 
     form.reset();
 
   } catch (error) {
-    message.textContent = "Error: " + error.message;
+    statusMessage.textContent =
+      "Submission failed. Please check your connection and try again.";
   } finally {
     button.disabled = false;
+    button.textContent = "Submit Enrollment";
   }
 });
 </script>
