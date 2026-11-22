@@ -1,284 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Enrollment Form</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Enrollment Form</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* { box-sizing: border-box; }
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #eef2ff;
-      padding: 20px;
-      margin: 0;
-    }
+body {
+  font-family: Arial, sans-serif;
+  background: #eef2ff;
+  padding: 20px;
+  margin: 0;
+}
 
-    .container {
-      max-width: 500px;
-      margin: 30px auto;
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
+.container {
+  max-width: 500px;
+  margin: 30px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px #0002;
+}
 
-    h2 {
-      text-align: center;
-      color: #263b80;
-    }
+h2 {
+  text-align: center;
+  color: #263b80;
+}
 
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      margin: 9px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 15px;
-    }
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 9px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
 
-    button {
-      width: 100%;
-      padding: 13px;
-      background: #263b80;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+button {
+  width: 100%;
+  padding: 13px;
+  background: #263b80;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    button:disabled {
-      opacity: 0.6;
-    }
+button:disabled { opacity: 0.6; }
 
-    #message {
-      text-align: center;
-      margin-top: 15px;
-    }
-  </style>
+#message {
+  text-align: center;
+  margin-top: 15px;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
+<h2>Student Enrollment Form</h2>
 
-  <h2>Student Enrollment Form</h2>
+<form id="enrollmentForm">
+<input id="studentName" placeholder="Student Name" required>
+<input id="email" type="email" placeholder="Email Address" required>
+<input id="phone" type="tel" placeholder="Phone Number" required>
+<input id="course" placeholder="Course Name" required>
+<input id="field" placeholder="Field / Branch" required>
+<input id="college" placeholder="College Name">
+<input id="rollNumber" placeholder="Roll Number">
+<textarea id="address" placeholder="Full Address" required></textarea>
 
-  <form id="enrollmentForm">
+<button type="submit" id="submitBtn">Submit Enrollment</button>
+</form>
 
-    <input type="text" id="studentName"
-      placeholder="Student Name" required>
-
-    <input type="email" id="email"
-      placeholder="Email Address" required>
-
-    <input type="tel" id="phone"
-      placeholder="Phone Number" required>
-
-    <input type="text" id="course"
-      placeholder="Course Name" required>
-
-    <input type="text" id="field"
-      placeholder="Field / Branch" required>
-
-    <input type="text" id="college"
-      placeholder="College Name">
-
-    <input type="text" id="rollNumber"
-      placeholder="Roll Number">
-
-    <textarea id="address"
-      placeholder="Full Address" required></textarea>
-
-    <button type="submit" id="submitBtn">
-      Submit Enrollment
-    </button>
-
-  </form>
-
-  <p id="message"></p>
-
+<p id="message"></p>
 </div>
 
-<script type="module">
+<script>
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3rZxPrgbEHuLofGnnEP7Pu361ahwM1a1ezGzU88U8PJctwtAUfetl5afgfho6-lbCBw/exec";
 
-  import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+const form = document.getElementById("enrollmentForm");
+const message = document.getElementById("message");
+const button = document.getElementById("submitBtn");
 
-  import {
-    getAuth,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+form.addEventListener("submit", async function(event) {
+  event.preventDefault();
 
-  import {
-    getFirestore,
-    collection,
-    addDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-
-  // FIREBASE CONFIGURATION
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAui_73IiFeFnpC7EkFqkCoc6FlDwhqhGA",
-    authDomain: "student-form-91ccf.firebaseapp.com",
-    projectId: "student-form-91ccf",
-    storageBucket: "student-form-91ccf.firebasestorage.app",
-    messagingSenderId: "812729360263",
-    appId: "1:812729360263:web:ada5aafd21bec488fafd22",
-    measurementId: "G-NM3BZFZQ2M"
+  const data = {
+    studentName: document.getElementById("studentName").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    course: document.getElementById("course").value.trim(),
+    field: document.getElementById("field").value.trim(),
+    college: document.getElementById("college").value.trim(),
+    rollNumber: document.getElementById("rollNumber").value.trim(),
+    address: document.getElementById("address").value.trim()
   };
 
+  button.disabled = true;
+  message.textContent = "Submitting...";
 
-  // INITIALIZE FIREBASE
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(data)
+    });
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+    message.textContent = "Request sent. Please check your Google Sheet.";
 
+    form.reset();
 
-  // YOUR GOOGLE APPS SCRIPT URL
-
-  const GOOGLE_SCRIPT_URL = 
-"https://script.google.com/macros/s/AKfycbzqQ-GaXWqYtxnQHQSczQhgqEdqHUqAYkKrS2D6YFKbTzSZBbd-OoMEF97ZYqoCaDl07w/exec".
-  // CHECK LOGIN
-
-  let currentUser = null;
-
-  const form = document.getElementById("enrollmentForm");
-  const message = document.getElementById("message");
-  const submitBtn = document.getElementById("submitBtn");
-
-  onAuthStateChanged(auth, (user) => {
-
-    if (!user) {
-      currentUser = null;
-      window.location.href = "index.html";
-      return;
-    }
-
-    currentUser = user;
-
-    document.getElementById("studentName").value =
-      user.displayName || "";
-
-    document.getElementById("email").value =
-      user.email || "";
-
-  });
-
-
-  // FORM SUBMISSION
-
-  form.addEventListener("submit", async (event) => {
-
-    event.preventDefault();
-
-    if (!currentUser) {
-      message.textContent = "Please sign in first.";
-      return;
-    }
-
-    if (!GOOGLE_SCRIPT_URL) {
-      message.textContent = "Google Script URL is missing.";
-      return;
-    }
-
-    submitBtn.disabled = true;
-    message.textContent = "Submitting your enrollment...";
-
-    const studentData = {
-      uid: currentUser.uid,
-
-      studentName:
-        document.getElementById("studentName").value.trim(),
-
-      email:
-        document.getElementById("email").value.trim(),
-
-      phone:
-        document.getElementById("phone").value.trim(),
-
-      course:
-        document.getElementById("course").value.trim(),
-
-      field:
-        document.getElementById("field").value.trim(),
-
-      college:
-        document.getElementById("college").value.trim(),
-
-      rollNumber:
-        document.getElementById("rollNumber").value.trim(),
-
-      address:
-        document.getElementById("address").value.trim(),
-
-      createdAt: new Date().toISOString()
-    };
-
-
-    try {
-
-      // SEND DATA TO GOOGLE SHEET
-
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(studentData)
-      });
-
-
-      // SAVE DATA IN FIREBASE
-
-      await addDoc(collection(db, "enrollments"), {
-        ...studentData,
-        createdAt: serverTimestamp()
-      });
-
-
-      message.textContent =
-        "Enrollment request submitted. Please check your Google Sheet.";
-
-      form.reset();
-
-      document.getElementById("studentName").value =
-        currentUser.displayName || "";
-
-      document.getElementById("email").value =
-        currentUser.email || "";
-
-    }
-
-    catch (error) {
-
-      console.error("Submission error:", error);
-
-      message.textContent =
-        "Error: " + error.message;
-
-    }
-
-    finally {
-
-      submitBtn.disabled = false;
-
-    }
-
-  });
-
+  } catch (error) {
+    message.textContent = "Error: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
 </script>
 
 </body>
 </html>
-
-
- 
